@@ -1,12 +1,13 @@
-name: Wake Up Hugging Face
+name: Wake Up Private HF Space
 on:
   schedule:
-    - cron: '*/40 * * * *' # প্রতি ৪০ মিনিট পর পর রান করবে
+    - cron: '*/30 * * * *' 
   workflow_dispatch: 
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Ping Request
-        run: curl -I https://nirjhar8-testing.hf.space
+      - name: Send Authenticated Ping
+        run: |
+          curl -I -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}" https://nirjhar8-testing.hf.space
