@@ -1,6 +1,8 @@
 name: Wake Up Private HF Space
+
 on:
   schedule:
+    # এটি প্রতি ৩০ মিনিট পর পর রান করবে
     - cron: '*/30 * * * *' 
   workflow_dispatch: 
 
@@ -8,6 +10,23 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Send Authenticated Ping
         run: |
-          curl -I -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}" https://nirjhar8-testing.hf.space
+          echo "Attempting to wake up the space..."
+          # --max-time 60: যদি ৬০ সেকেন্ডের মধ্যে রেসপন্স না আসে তবে টাইমআউট করবে
+          # -f: ফেইল করলে এরর কোড দিবে
+          # -L: রিডাইরেক্ট ফলো করবে
+          curl -v -f -L --max-time 60 \
+            -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}" \
+            https://nirjhar8-testing.hf.space
+            
+      - name: Success Message
+        if: success()
+        run: echo "Successfully pinged the space!"
+
+      - name: Failure Message
+        if: failure()
+        run: echo "Failed to ping the space. Please check your token or Space URL."
